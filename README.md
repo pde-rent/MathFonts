@@ -23,12 +23,39 @@ and so Reserved Font Names remain unchanged.
 The build system features:
 - **Multi-threaded compilation**: Fonts are downloaded and processed in parallel for faster builds
 - **Automatic LICENSE standardization**: All font licenses are automatically detected and standardized to a common `LICENSE` file format
-- **Organized output**: Processed fonts (optimized .woff2 and license) are organized in the `./dist` directory with consistent structure
-- **Optimized for web**: Only WOFF2 files and LICENSE files are included in the repository for minimal size
+- **Release-based distribution**: Compiled fonts are distributed through GitHub Releases rather than being stored in the repository
+- **Optimized for web**: Only WOFF2 files and LICENSE files are included in releases for minimal size
 
 The .woff2 fonts are optimized for web use and provide the best compression and performance.
 
-**Repository Policy**: This repository includes only WOFF2 font files and their corresponding LICENSE files to maintain a reasonable repository size. Other formats (TTF, OTF, WOFF) are excluded from version control but can be generated locally using the build system.
+**Repository Policy**: This repository contains only the build system and documentation. Compiled fonts are distributed through [GitHub Releases](https://github.com/pde-rent/MathFonts/releases) to maintain a clean repository without large binary files.
+
+Getting the Fonts
+------------------
+
+### Option 1: Download Pre-built Releases (Recommended)
+
+Download the latest font collection from the [Releases page](https://github.com/pde-rent/MathFonts/releases):
+
+1. Go to [https://github.com/pde-rent/MathFonts/releases](https://github.com/pde-rent/MathFonts/releases)
+2. Download either:
+   - `mathfonts-X.Y.Z.zip` (ZIP archive)
+   - `mathfonts-X.Y.Z.tar.gz` (TAR.GZ archive)
+3. Extract the archive to your desired location
+
+Each release contains all fonts organized by family, with LICENSE files included.
+
+### Option 2: Build from Source
+
+If you need to customize the build or want the latest changes:
+
+```bash
+git clone https://github.com/pde-rent/MathFonts.git
+cd MathFonts
+make all-parallel  # Build all fonts
+```
+
+See the "Build Instructions" section below for detailed build information.
 
 Warning
 -------
@@ -44,8 +71,8 @@ This page uses features that may not be supported by legacy web rendering engine
 Using Math fonts on your Web site
 ---------------------------------
 
-The processed fonts are available in the `./dist` directory. Choose one family for your web site and place 
-the corresponding subdirectory somewhere accessible.
+After downloading fonts from a release, choose one family for your web site and place 
+the corresponding subdirectory somewhere accessible on your web server.
 
 Make your pages link to the `mathfonts.css` stylesheet. The MathML formulas
 will then render with the specified font. It's good to make them consistent
@@ -171,9 +198,9 @@ After building, fonts will be organized in the `./dist` directory:
 dist/
 ├── Asana/
 │   ├── LICENSE          # Standardized license file
-│   ├── AsanaMath.woff2  # WOFF2 version (included in repo)
-│   ├── AsanaMath.otf    # Original OpenType font (build only)
-│   └── AsanaMath.woff   # WOFF version (build only)
+│   ├── AsanaMath.woff2  # WOFF2 version (optimized for web)
+│   ├── AsanaMath.otf    # Original OpenType font
+│   └── AsanaMath.woff   # WOFF version
 ├── DejaVu/
 │   ├── LICENSE
 │   ├── DejaVuMath.woff2
@@ -181,12 +208,72 @@ dist/
 └── ...
 ```
 
-**Note**: Only .woff2 and LICENSE files are included in the Git repository. Other formats are generated during the build process but excluded from version control to maintain repository size.
+**Note**: The `dist/` directory is excluded from version control. All compiled fonts are distributed through GitHub Releases instead.
 
 ### Cleaning
 
 - `make clean` - Remove build artifacts (`tmp/` directory)
 - `make distclean` - Remove all generated files including test outputs
+
+Creating Releases
+-----------------
+
+This repository includes scripts to create versioned releases with pre-built font packages:
+
+### Simple Release (Shell Script)
+
+```bash
+./release.sh [version]
+```
+
+This will:
+1. Build all fonts using `make all-parallel`
+2. Create ZIP and TAR.GZ archives in the `tmp/` directory
+3. Create a git tag for the version
+4. Provide instructions for manual GitHub release creation
+
+### Automated Release (Python Script)
+
+For fully automated releases with GitHub integration:
+
+```bash
+# Install dependencies
+pip install requests
+
+# Create release (requires GitHub token)
+export GITHUB_TOKEN=your_personal_access_token
+python release.py [--version v1.2.3] [--dry-run]
+```
+
+This will:
+1. Build all fonts
+2. Create versioned archives
+3. Automatically create a GitHub release with detailed release notes
+4. Upload the font archives as release assets
+5. Create and push git tags
+
+### Release Script Options
+
+- `--version v1.2.3` - Specify exact version (default: auto-increment patch version)
+- `--dry-run` - Show what would be done without executing
+- `--token TOKEN` - GitHub personal access token (or use `GITHUB_TOKEN` environment variable)
+
+### GitHub Token Setup
+
+To use automated releases, create a GitHub personal access token:
+
+1. Go to GitHub Settings → Developer settings → Personal access tokens
+2. Generate a new token with `repo` scope
+3. Set it as an environment variable: `export GITHUB_TOKEN=your_token`
+
+### Manual Release Process
+
+If you prefer manual control:
+
+1. Build fonts: `make all-parallel`
+2. Create archives: `./release.sh`
+3. Go to [GitHub Releases](https://github.com/pde-rent/MathFonts/releases)
+4. Create a new release and upload the generated archives from `tmp/`
 
 ### Available Fonts
 
