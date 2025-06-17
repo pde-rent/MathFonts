@@ -40,7 +40,7 @@ XITS_URLS := "http://mirrors.ctan.org/fonts/xits.zip"
 XITS_OFL_ARGS := "2007" "Khaled Hosny" "XITS"
 
 # --- Build System ---
-.PHONY: all all-parallel check-deps clean distclean help $(FONTS)
+.PHONY: all all-parallel check-deps clean distclean help release release-dry-run $(FONTS)
 
 # Stamp files to track downloads
 DOWNLOAD_STAMPS := $(patsubst %,$(TMP_DIR)/%-downloaded,$(FONTS))
@@ -58,6 +58,10 @@ help:
 	@echo "  clean         - Remove all build artifacts"
 	@echo "  distclean     - Remove all build artifacts and other generated files"
 	@echo "  check-deps    - Check for required dependencies"
+	@echo
+	@echo "Release Targets:"
+	@echo "  release       - Build fonts and create release archives"
+	@echo "  release-dry-run - Test release process without building fonts"
 
 # 'all' and 'all-parallel' are now functionally identical.
 # Parallelism is controlled by the -j flag, e.g., 'make -j all'
@@ -222,3 +226,13 @@ TeXGyreTermes: $(TMP_DIR)/TeXGyreTermes-downloaded
 
 XITS: $(TMP_DIR)/XITS-downloaded
 	@source utils.sh && process_and_finalize_simple "XITS" $(XITS_OFL_ARGS)
+
+# --- Release Targets ---
+
+release:
+	@echo "Creating MathFonts release..."
+	@./release.sh
+
+release-dry-run:
+	@echo "Testing MathFonts release process..."
+	@./release.sh --dry-run
