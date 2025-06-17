@@ -8,13 +8,8 @@ font-sizes.txt
 autom4te.cache/
 *.log
 
-# Font files - keep only WOFF2 and LICENSE files
-dist/**/*.ttf
-dist/**/*.otf
-dist/**/*.woff
-# Allow WOFF2 and LICENSE files
-!dist/**/*.woff2
-!dist/**/LICENSE
+# Font distribution directory - managed via releases
+dist/
 
 # Web extension artifacts
 webextension/fonts
