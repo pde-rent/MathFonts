@@ -61,23 +61,25 @@ fi
 mkdir -p tmp
 
 if [[ "$DRY_RUN" == "true" ]]; then
-    # Create dummy dist for dry run
+    # Create dummy dist for dry run in a temporary location
     echo "Creating dummy font files for testing..."
-    mkdir -p dist/TestFont
-    echo "Test font file" > dist/TestFont/TestFont.woff2
-    echo "Test license" > dist/TestFont/LICENSE
+    DIST_DIR="tmp/dist-dryrun"
+    mkdir -p "$DIST_DIR/TestFont"
+    echo "Test font file" > "$DIST_DIR/TestFont/TestFont.woff2"
+    echo "Test license" > "$DIST_DIR/TestFont/LICENSE"
     echo "Would run: make clean && make all-parallel"
 else
     # Build fonts
     echo "Building fonts (this may take several minutes)..."
     echo "You can interrupt with Ctrl+C if needed"
+    DIST_DIR="dist"
     make clean
     make all-parallel
 fi
 
 # Check if dist exists
-if [ ! -d "dist" ]; then
-    echo "Error: dist directory not created"
+if [ ! -d "$DIST_DIR" ]; then
+    echo "Error: $DIST_DIR directory not created"
     exit 1
 fi
 
@@ -86,18 +88,20 @@ VERSION_CLEAN=${VERSION#v}
 
 # Create ZIP archive
 echo "Creating ZIP archive..."
-cd dist
-zip -r "../tmp/mathfonts-$VERSION_CLEAN.zip" .
-cd ..
+if [[ "$DRY_RUN" == "true" ]]; then
+    (cd "$DIST_DIR" && zip -r "../../tmp/mathfonts-$VERSION_CLEAN.zip" .)
+else
+    (cd "$DIST_DIR" && zip -r "../tmp/mathfonts-$VERSION_CLEAN.zip" .)
+fi
 
 # Create TAR.GZ archive
 echo "Creating TAR.GZ archive..."
-tar -czf "tmp/mathfonts-$VERSION_CLEAN.tar.gz" -C dist .
+tar -czf "tmp/mathfonts-$VERSION_CLEAN.tar.gz" -C "$DIST_DIR" .
 
 # Calculate sizes
 ZIP_SIZE=$(du -h "tmp/mathfonts-$VERSION_CLEAN.zip" | cut -f1)
 TAR_SIZE=$(du -h "tmp/mathfonts-$VERSION_CLEAN.tar.gz" | cut -f1)
-FONT_COUNT=$(find dist -name "*.woff2" | wc -l)
+FONT_COUNT=$(find "$DIST_DIR" -name "*.woff2" | wc -l)
 
 echo "Release archives created:"
 echo "  - mathfonts-$VERSION_CLEAN.zip ($ZIP_SIZE)"
@@ -117,6 +121,10 @@ if [[ "$DRY_RUN" == "false" ]]; then
     echo "     - tmp/mathfonts-$VERSION_CLEAN.zip"
     echo "     - tmp/mathfonts-$VERSION_CLEAN.tar.gz"
     echo "  3. Or use: python release.py --version $VERSION --token YOUR_GITHUB_TOKEN"
+    
+    # Clean up dist directory to keep repo clean (only in real mode)
+    echo "Cleaning up dist directory..."
+    rm -rf dist
 else
     echo ""
     echo "DRY RUN completed! No git tag created."
@@ -124,8 +132,8 @@ else
     echo "  1. Build all fonts with 'make all-parallel'"
     echo "  2. Create git tag $VERSION"
     echo "  3. Create release archives with real fonts"
-fi
-
-# Clean up dist directory to keep repo clean
-echo "Cleaning up dist directory..."
-rm -rf dist 
+    
+    # Clean up only the temporary dry-run directory
+    echo "Cleaning up temporary dry-run directory..."
+    rm -rf "$DIST_DIR"
+fi 
