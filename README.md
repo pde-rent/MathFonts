@@ -15,8 +15,7 @@ Description
 This repository contains a build system to fetch various open source OpenType fonts
 with a MATH table as well as the corresponding fonts to use for the surrounding
 text (if any). The fonts are automatically downloaded, processed, and converted into 
-WOFF (with zopfli compression) and WOFF2 formats using
-[fonttools](https://github.com/behdad/fonttools), which may perform additional
+WOFF2 format using [fonttools](https://github.com/behdad/fonttools), which may perform additional
 optimizations. It is expected that all the transformations preserve
 [Functional Equivalence](http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL_web_fonts_and_RFNs#33301a9c)
 and so Reserved Font Names remain unchanged. 
@@ -24,9 +23,12 @@ and so Reserved Font Names remain unchanged.
 The build system features:
 - **Multi-threaded compilation**: Fonts are downloaded and processed in parallel for faster builds
 - **Automatic LICENSE standardization**: All font licenses are automatically detected and standardized to a common `LICENSE` file format
-- **Organized output**: Processed fonts (source .ttf and/or .otf, optimized .woff and .woff2 and license) are organized in the `./dist` directory with consistent structure
+- **Organized output**: Processed fonts (optimized .woff2 and license) are organized in the `./dist` directory with consistent structure
+- **Optimized for web**: Only WOFF2 files and LICENSE files are included in the repository for minimal size
 
-The .woff and .woff2 fonts are optimized for web use.
+The .woff2 fonts are optimized for web use and provide the best compression and performance.
+
+**Repository Policy**: This repository includes only WOFF2 font files and their corresponding LICENSE files to maintain a reasonable repository size. Other formats (TTF, OTF, WOFF) are excluded from version control but can be generated locally using the build system.
 
 Warning
 -------
@@ -42,8 +44,7 @@ This page uses features that may not be supported by legacy web rendering engine
 Using Math fonts on your Web site
 ---------------------------------
 
-After building the fonts (see Build Instructions below), the processed fonts will be
-available in the `./dist` directory. Choose one family for your web site and place 
+The processed fonts are available in the `./dist` directory. Choose one family for your web site and place 
 the corresponding subdirectory somewhere accessible.
 
 Make your pages link to the `mathfonts.css` stylesheet. The MathML formulas
@@ -51,7 +52,7 @@ will then render with the specified font. It's good to make them consistent
 with the surrounding text, especially for inline expressions. To do that,
 use the `htmlmathparagraph` class, e.g. `<body class="htmlmathparagraph">`.
 By default, the local fonts installed on the system will be used. For open
-source fonts, Web fonts in WOFF2 or WOFF format will be used as a fallback.
+source fonts, Web fonts in WOFF2 format will be used as a fallback.
 
 Most families provide old style numbers in the text font. You can use them via
 the `oldstylenumbers` class, e.g.
@@ -89,7 +90,7 @@ You can use various tools to subset fonts:
 
 **Using `pyftsubset` (from fonttools):**
 ```bash
-pyftsubset font.otf --unicodes="U+0100-017F,U+2200-22FF,U+27C0-27EF,U+2980-29FF,U+2A00-2AFF,U+1D400-1D7FF,U+1EE00-1EEFF" --output-file=font-subset.otf
+pyftsubset font.woff2 --unicodes="U+0100-017F,U+2200-22FF,U+27C0-27EF,U+2980-29FF,U+2A00-2AFF,U+1D400-1D7FF,U+1EE00-1EEFF" --output-file=font-subset.woff2
 ```
 
 **Using `fonttools`:**
@@ -100,9 +101,9 @@ fonttools subset font.woff2 --unicodes="U+0100-017F,U+2200-22FF,U+27C0-27EF,U+29
 ### Size Benefits
 
 Typical size reductions when using mathematical subsets:
-- **Original fonts**: 200KB - 2MB per font file
-- **Subsetted fonts**: 50KB - 500KB per font file
-- **Size reduction**: 60-80% smaller files
+- **Original WOFF2 fonts**: 200KB - 500KB per font file
+- **Subsetted WOFF2 fonts**: 50KB - 200KB per font file
+- **Size reduction**: 40-70% smaller files
 
 This dramatically improves web page loading times while maintaining full mathematical typesetting capabilities.
 
@@ -170,19 +171,21 @@ After building, fonts will be organized in the `./dist` directory:
 dist/
 ├── Asana/
 │   ├── LICENSE          # Standardized license file
-│   ├── AsanaMath.otf    # Original OpenType font
-│   ├── AsanaMath.woff   # WOFF version (zopfli compressed)
-│   └── AsanaMath.woff2  # WOFF2 version
+│   ├── AsanaMath.woff2  # WOFF2 version (included in repo)
+│   ├── AsanaMath.otf    # Original OpenType font (build only)
+│   └── AsanaMath.woff   # WOFF version (build only)
 ├── DejaVu/
 │   ├── LICENSE
-│   ├── DejaVuMath.otf
+│   ├── DejaVuMath.woff2
 │   └── ...
 └── ...
 ```
 
+**Note**: Only .woff2 and LICENSE files are included in the Git repository. Other formats are generated during the build process but excluded from version control to maintain repository size.
+
 ### Cleaning
 
-- `make clean` - Remove build artifacts (`tmp/` and `dist/` directories)
+- `make clean` - Remove build artifacts (`tmp/` directory)
 - `make distclean` - Remove all generated files including test outputs
 
 ### Available Fonts
