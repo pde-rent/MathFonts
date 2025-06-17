@@ -1,29 +1,24 @@
-*/*.TXT
-*/*.pdf
-*/*.txt
-*/*.woff
-*/*.woff2
-*/*.zip
-*/AUTHORS
-*/LICENSE
-*/NEWS
-*/README
-*/README.md
-*/index.html
-Asana/Asana-Math
-DejaVu/dejavu-fonts-ttf
-FiraMath/firamath/
-Garamond/garamond/
-GFS_NeoHellenic/gfs_neohellenic/
-LatinModern/latinmodern/
-Libertinus/libertinus/
-Makefile
-NeoEuler/euler-otf-master/
-STIX/stix/
-TeXGyre*/texgyre*/
-XITS/xits/
+# Temporary build files and downloads
+tmp/
+
+# Generated files and build artifacts
+CheckFont*.txt
+CheckFont*.html
+font-sizes.txt
 autom4te.cache/
-config.log
-config.status
+*.log
+
+# Font files - keep only WOFF2 and LICENSE files
+dist/**/*.ttf
+dist/**/*.otf
+dist/**/*.woff
+# Allow WOFF2 and LICENSE files
+!dist/**/*.woff2
+!dist/**/LICENSE
+
+# Web extension artifacts
 webextension/fonts
 webextension-mathml-fonts.zip
+
+# Virtual environment
+.venv/

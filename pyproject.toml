@@ -1,0 +1,17 @@
+[project]
+name = "mathfonts"
+version = "0.1.0"
+description = "Math fonts package for web browsers"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "fonttools[woff]",
+    "zopfli",
+    "brotli",
+]
+
+[project.optional-dependencies]
+dev = []
+
+[tool.uv]
+dev-dependencies = [] 
